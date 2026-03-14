@@ -1,0 +1,183 @@
+{
+  "name": "tugas 2 pengembangan AI tanpa Koding",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When chat message received').item.json.chatInput }}",
+        "options": {
+          "systemMessage": "Kamu adalah chatbot AI resmi milik NFA (Nurul Fikri Academy) yang bertugas membantu pengguna mendapatkan informasi tentang produk yang tersedia beserta harganya.\n\nTugas utama kamu adalah menjawab pertanyaan pengguna yang berkaitan dengan:\n\n* Nama produk\n* Deskripsi singkat produk\n* Harga produk\n* Informasi ketersediaan produk\n\nAturan dalam menjawab:\n\n1. Gunakan bahasa Indonesia yang sopan, ramah, dan mudah dipahami.\n2. Berikan jawaban yang singkat, jelas, dan informatif.\n3. Jika pengguna menanyakan harga produk, berikan harga sesuai dengan data yang tersedia.\n4. Jika pengguna menanyakan produk tertentu, berikan nama produk, deskripsi singkat, dan harga produk tersebut.\n5. Jika produk yang ditanyakan tidak tersedia dalam data, jawab dengan sopan bahwa produk tersebut belum tersedia di NFA.\n6. Jangan membuat informasi produk atau harga yang tidak ada di dalam data.\n\nFokuslah hanya pada pertanyaan yang berkaitan dengan Pelatihan dan harga yang tersedia di NFA.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        992,
+        0
+      ],
+      "id": "097139a0-1c6d-4c1a-9980-3b02f718e364",
+      "name": "AI Agent",
+      "executeOnce": false,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        992,
+        176
+      ],
+      "id": "5140e458-88b3-4f86-8031-01b1eb8869bc",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "VAaaS8DDeamC43m3",
+          "name": "Groq account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1jDrpNbf8tpqQ_B5YDP-TRhOr-KYXnTiFjSWSbtp_RJM",
+          "mode": "list",
+          "cachedResultName": "n8n 1 spredsheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jDrpNbf8tpqQ_B5YDP-TRhOr-KYXnTiFjSWSbtp_RJM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jDrpNbf8tpqQ_B5YDP-TRhOr-KYXnTiFjSWSbtp_RJM/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1136,
+        160
+      ],
+      "id": "ee383c2f-7fcd-4a41-9d75-718d567edba6",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2wJqB0DXuwirjbTO",
+          "name": "Google Sheets account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hi there! 👋\nMy name is sufi. How can I assist you today?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        448,
+        0
+      ],
+      "id": "60d1a43d-1c69-4f9a-8a93-1ce183a42fca",
+      "name": "When chat message received",
+      "webhookId": "f49f20cf-ac79-4829-b6d1-e9fad01d1961"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "26722cda-63f6-43f6-b285-91852379cd55",
+              "name": "Chat",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        688,
+        0
+      ],
+      "id": "a910955e-f860-47d9-9d79-a665bbe10b51",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "701cf401-009f-45cd-b036-b06c9831416a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e73dc739fe6ffe4393f7dcb82ea705d965bcb21eb37761ce0d07d033083fb85b"
+  },
+  "id": "Befb0NTXdbks8jq7",
+  "tags": []
+}
