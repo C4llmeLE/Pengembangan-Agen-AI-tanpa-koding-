@@ -1,0 +1,197 @@
+{
+  "name": "Tugas 3 pengembangan AI tanpa koding",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hi there! 👋\nMy name is Sufi. How can I assist you today?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -32,
+        0
+      ],
+      "id": "616a1ead-a68f-46ac-b02e-e571b7a936bd",
+      "name": "When chat message received",
+      "webhookId": "4e15624a-4017-4429-9cf1-eaa3061f0f1d"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3a2d8c0a-13bd-48d6-a3e2-0e512b79450f",
+              "name": "",
+              "value": "={{ $json.chatInput}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        0
+      ],
+      "id": "13f34e54-ff63-4cb6-8214-20bd0b9c119a",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When chat message received').item.json.chatInput}}",
+        "options": {
+          "systemMessage": "Kamu adalah chatbot AI resmi milik NFA (Nurul Fikri Academy) yang bertugas membantu pengguna mendapatkan informasi tentang produk yang tersedia beserta harganya.\n\nTugas utama kamu adalah menjawab pertanyaan pengguna yang berkaitan dengan:\n\n* Nama produk\n* Deskripsi singkat produk\n* Harga produk\n* Informasi ketersediaan produk\n\nAturan dalam menjawab:\n\n1. Gunakan bahasa Indonesia yang sopan, ramah, dan mudah dipahami.\n2. Berikan jawaban yang singkat, jelas, dan informatif.\n3. Jika pengguna menanyakan harga produk, berikan harga sesuai dengan data yang tersedia.\n4. Jika pengguna menanyakan produk tertentu, berikan nama produk, deskripsi singkat, dan harga produk tersebut.\n5. Jika produk yang ditanyakan tidak tersedia dalam data, jawab dengan sopan bahwa produk tersebut belum tersedia di NFA.\n6. Jangan membuat informasi produk atau harga yang tidak ada di dalam data.\n\nFokuslah hanya pada pertanyaan yang berkaitan dengan Pelatihan dan harga yang tersedia di NFA."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "d97bf6bd-0173-4482-b9f4-d0e2e6ce0481",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1jDrpNbf8tpqQ_B5YDP-TRhOr-KYXnTiFjSWSbtp_RJM",
+          "mode": "list",
+          "cachedResultName": "n8n 1 spredsheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jDrpNbf8tpqQ_B5YDP-TRhOr-KYXnTiFjSWSbtp_RJM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jDrpNbf8tpqQ_B5YDP-TRhOr-KYXnTiFjSWSbtp_RJM/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        256
+      ],
+      "id": "0ff63205-7525-47e2-9d1f-03355d294f28",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2wJqB0DXuwirjbTO",
+          "name": "Google Sheets account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        400,
+        256
+      ],
+      "id": "ce02454f-78d4-4a93-9445-3993ef95d9c1",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "hiDh6YqogDt9lsj2",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        512,
+        256
+      ],
+      "id": "17f5639d-ec62-47c1-af00-8dad0d8788da",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "3d0a8512-24e2-45e4-8b29-5d989663c8dd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e73dc739fe6ffe4393f7dcb82ea705d965bcb21eb37761ce0d07d033083fb85b"
+  },
+  "id": "y9d01TVBpFwArdVl",
+  "tags": []
+}
